@@ -29,6 +29,8 @@ class Class_Options(Enum):
     Rogue = 5
 
 class Class_Information():
+    #Using namedtuples  here for ease of readability, and because this information should never be changed so immutability isn't a problem.
+    #Each class should have a name and a hit dice associated with it at the moment. More to potentially come soon
     character_class = namedtuple('ClassInfo', ['name', 'hit_dice'])
     default_class = character_class('default class', 0)
     
@@ -42,6 +44,9 @@ class Class_Information():
                         Class_Options.Paladin : paladin_class, Class_Options.Rogue : rogue_class}
 
 class Race_Information():
+    
+    #Using namedtuples  here for ease of readability, and because this information should never be changed so immutability isn't a problem.
+    #Each race currently has a name, and one of a few potential stat modifiers.
     Character_Races = namedtuple('RacialInfo', ['name', 'str', 'dex', 'con', 'int', 'wis', 'cha'])
     default_race = Character_Races('<default race>', 0, 0, 0, 0, 0, 0)
     
@@ -88,6 +93,7 @@ class Player_Actor(Actor):
         self.valid_input = False
         while(self.valid_input != True):
 
+            #1. Should be roll 3d6
             if(self.player_input == 1):
                 
                 for key in self.actor_stats.keys():
@@ -95,6 +101,7 @@ class Player_Actor(Actor):
                     self.actor_stats[key] = sum(dice_roll)
                     self.valid_input = True
             
+            #2 should be roll 4d6 and we drop the lowest
             if(self.player_input == 2):
 
                 for key in self.actor_stats.keys():
@@ -102,11 +109,13 @@ class Player_Actor(Actor):
                     self.actor_stats[key] = sum(dice_roll) - min(dice_roll)
                     self.valid_input = True
                 
+            #3 should be roll 1d6 and add 8
             if(self.player_input == 3):
                 for key in self.actor_stats.keys():
                     self.actor_stats[key] = random.randint(1,6) + 8
                     self.valid_input = True
             
+            #4 should be roll 1d20
             if(self.player_input == 4):
                 for key in self.actor_stats.keys():
                     self.actor_stats[key] = random.randint(1,20)
@@ -115,11 +124,14 @@ class Player_Actor(Actor):
     def Race_Selection(self,player_input):
         self.player_input = player_input
         
+        #Taking the key that was returned from the players selection earlier and using that to set the race by searching our stored race information
         selected_race = self.race_information.possibleRaces.get(self.player_input)
 
+        #this is potentially not as efficient as it could be, but for the time being setting the name of the race stored in the player_actor to the one we've obtained
         self.character_race = getattr(selected_race, 'name')
         index = 1
 
+        #Cycling through our stats to adjust based on the selected race
         for key in self.actor_stats.keys():
             self.actor_stats[key] = self.actor_stats[key] + selected_race[index]
             index += 1
