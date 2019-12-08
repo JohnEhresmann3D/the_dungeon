@@ -9,6 +9,9 @@ from Character_Options import Race_Options
 from Character_Options import Class_Options
 from request_logic import User_Requests
 
+six_sided = range(1,6)
+twenty_sided = range(1,20)
+
 class Player_Actor(Actor):
 
     #class variables
@@ -23,44 +26,42 @@ class Player_Actor(Actor):
     dice_roll = [0,0,0,0]
 
     def Stat_Roll(self,player_input):
-        self.player_input = player_input
-
+        
         self.valid_input = False
         while(self.valid_input != True):
 
             #1. Should be roll 3d6
-            if(self.player_input == 1):
+            if(player_input == 1):
                 
                 for key in self.actor_stats.keys():
-                    dice_roll = random.sample(range(1,6), 3)
+                    dice_roll = random.sample(six_sided, 3)
                     self.actor_stats[key] = sum(dice_roll)
                     self.valid_input = True
             
             #2 should be roll 4d6 and we drop the lowest
-            if(self.player_input == 2):
+            if(player_input == 2):
 
                 for key in self.actor_stats.keys():
-                    dice_roll = random.sample(range(1,6),4)
+                    dice_roll = random.sample(six_sided,4)
                     self.actor_stats[key] = sum(dice_roll) - min(dice_roll)
                     self.valid_input = True
                 
             #3 should be roll 1d6 and add 8
-            if(self.player_input == 3):
+            if(player_input == 3):
                 for key in self.actor_stats.keys():
                     self.actor_stats[key] = random.randint(1,6) + 8
                     self.valid_input = True
             
             #4 should be roll 1d20
-            if(self.player_input == 4):
+            if(player_input == 4):
                 for key in self.actor_stats.keys():
-                    self.actor_stats[key] = random.randint(1,20)
+                    self.actor_stats[key] = twenty_sided
                     self.valid_input = True
     
     def Race_Selection(self,player_input):
-        self.player_input = player_input
-        
+               
         #Taking the key that was returned from the players selection earlier and using that to set the race by searching our stored race information
-        selected_race = Race_Information.possibleRaces.get(self.player_input)
+        selected_race = Race_Information.possibleRaces.get(player_input)
 
         #this is potentially not as efficient as it could be, but for the time being setting the name of the race stored in the player_actor to the one we've obtained
         self.character_race = getattr(selected_race, 'name')
@@ -72,9 +73,8 @@ class Player_Actor(Actor):
             index += 1
     
     def Class_Selection(self,player_input):
-        self.player_input = player_input
-
-        selected_class = Class_Information.potential_classes.get(self.player_input)
+        
+        selected_class = Class_Information.potential_classes.get(player_input)
 
         self.character_class = getattr(selected_class, "name")
         self.actor_hit_dice = getattr(selected_class, "hit_dice")
