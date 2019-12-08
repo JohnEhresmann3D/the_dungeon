@@ -67,6 +67,10 @@ class Actor():
     actor_stats[Stats.Wis] = 0
     actor_stats[Stats.Cha] = 0
 
+    #setting hit_points
+    actor_hit_dice = 0
+    actor_hit_points = 0
+
 class Player_Actor(Actor):
 
     #class variables
@@ -74,6 +78,7 @@ class Player_Actor(Actor):
     race_information = Race_Information()
 
     character_race = ""
+    character_class = ""
 
     dice_roll = [0,0,0,0]
 
@@ -119,8 +124,20 @@ class Player_Actor(Actor):
             self.actor_stats[key] = self.actor_stats[key] + selected_race[index]
             index += 1
     
+    def Class_Selection(self,player_input):
+        self.player_input = player_input
+
+        selected_class = self.class_information.potential_classes.get(self.player_input)
+
+        self.character_class = getattr(selected_class, "name")
+        self.actor_hit_dice = getattr(selected_class, "hit_dice")
+
+        self.actor_hit_points = random.randint(1, self.actor_hit_dice)
+
+    
     def Character_Sheet(self):
-        print("Race: " + self.character_race + "\n")
+        print("Race: " + self.character_race + "Class: " + self.character_class + "\n")
+        print( "Hit Dice: " + str(self.actor_hit_dice) + " HP : " + str(self.actor_hit_points))
         for key in self.actor_stats.keys():
             print(key.name + ":" + str(self.actor_stats[key]))
         
@@ -164,7 +181,19 @@ class User_Requests():
                 print("Please try again\n")
     
     def Class_Request(self):
-        print("stuff happened")
+        print("And now at last, it is time to pick your class")
+
+        is_valid = False
+        while(is_valid != True):
+
+            player_input = str(input("Please enter 'Fighter', 'Cleric', 'Paladin', 'Wizard', or 'Rogue' "))
+            for key in self.class_information.potential_classes.keys():
+                if(player_input.lower() == key.name.lower()):
+                    is_valid = True
+                    return key
+            
+            if(is_valid == False):
+                print("Invalid selection, please try again")
 
                     
             
@@ -182,6 +211,9 @@ class Game_Driver():
     
     player_input = user_reqests.Race_Request()
     test_actor.Race_Selection(player_input)
+
+    player_input = user_reqests.Class_Request()
+    test_actor.Class_Selection(player_input)
 
     test_actor.Character_Sheet()
             
